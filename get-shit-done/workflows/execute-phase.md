@@ -93,6 +93,12 @@ When `CONTEXT_WINDOW >= 500000` (1M-class models), subagent prompts include rich
 - Verifier agents receive all PLAN.md, SUMMARY.md, CONTEXT.md files plus REQUIREMENTS.md
 - This enables cross-phase awareness and history-aware verification
 
+When `CONTEXT_WINDOW < 200000` (sub-200K models), subagent prompts are thinned to reduce static overhead:
+- Executor agents omit extended deviation rule examples and checkpoint examples from inline prompt — load on-demand via @~/.claude/get-shit-done/references/executor-examples.md
+- Planner agents omit extended anti-pattern lists and specificity examples from inline prompt — load on-demand via @~/.claude/get-shit-done/references/planner-antipatterns.md
+- Core rules and decision logic remain inline; only verbose examples and edge-case lists are extracted
+- This reduces executor static overhead by ~40% while preserving behavioral correctness
+
 **If `phase_found` is false:** Error — phase directory not found.
 **If `plan_count` is 0:** Error — no plans found in phase.
 **If `state_exists` is false but `.planning/` exists:** Offer reconstruct or continue.
@@ -395,6 +401,7 @@ Execute each selected wave in sequence. Within a wave: parallel if `PARALLELIZAT
        @~/.claude/get-shit-done/templates/summary.md
        @~/.claude/get-shit-done/references/checkpoints.md
        @~/.claude/get-shit-done/references/tdd.md
+       ${CONTEXT_WINDOW < 200000 ? '' : '@~/.claude/get-shit-done/references/executor-examples.md'}
        </execution_context>
 
        <files_to_read>

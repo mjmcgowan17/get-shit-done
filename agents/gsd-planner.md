@@ -268,17 +268,9 @@ When a plan creates new interfaces consumed by subsequent tasks:
 
 This prevents the "scavenger hunt" anti-pattern where executors explore the codebase to understand contracts. They receive the contracts in the plan itself.
 
-## Specificity Examples
+## Specificity
 
-| TOO VAGUE | JUST RIGHT |
-|-----------|------------|
-| "Add authentication" | "Add JWT auth with refresh rotation using jose library, store in httpOnly cookie, 15min access / 7day refresh" |
-| "Create the API" | "Create POST /api/projects endpoint accepting {name, description}, validates name length 3-50 chars, returns 201 with project object" |
-| "Style the dashboard" | "Add Tailwind classes to Dashboard.tsx: grid layout (3 cols on lg, 1 on mobile), card shadows, hover states on action buttons" |
-| "Handle errors" | "Wrap API calls in try/catch, return {error: string} on 4xx/5xx, show toast via sonner on client" |
-| "Set up the database" | "Add User and Project models to schema.prisma with UUID ids, email unique constraint, createdAt/updatedAt timestamps, run prisma db push" |
-
-**Test:** Could a different Claude instance execute without asking clarifying questions? If not, add specificity.
+**Test:** Could a different Claude instance execute without asking clarifying questions? If not, add specificity. See @~/.claude/get-shit-done/references/planner-antipatterns.md for vague-vs-specific comparison table.
 
 ## TDD Detection
 
@@ -797,36 +789,10 @@ When Claude tries CLI/API and gets auth error → creates checkpoint → user au
 
 **DON'T:** Ask human to do work Claude can automate, mix multiple verifications, place checkpoints before automation completes.
 
-## Anti-Patterns
+## Anti-Patterns and Extended Examples
 
-**Bad - Asking human to automate:**
-```xml
-<task type="checkpoint:human-action">
-  <action>Deploy to Vercel</action>
-  <instructions>Visit vercel.com, import repo, click deploy...</instructions>
-</task>
-```
-Why bad: Vercel has a CLI. Claude should run `vercel --yes`.
-
-**Bad - Too many checkpoints:**
-```xml
-<task type="auto">Create schema</task>
-<task type="checkpoint:human-verify">Check schema</task>
-<task type="auto">Create API</task>
-<task type="checkpoint:human-verify">Check API</task>
-```
-Why bad: Verification fatigue. Combine into one checkpoint at end.
-
-**Good - Single verification checkpoint:**
-```xml
-<task type="auto">Create schema</task>
-<task type="auto">Create API</task>
-<task type="auto">Create UI</task>
-<task type="checkpoint:human-verify">
-  <what-built>Complete auth flow (schema + API + UI)</what-built>
-  <how-to-verify>Test full flow: register, login, access protected page</how-to-verify>
-</task>
-```
+For checkpoint anti-patterns, specificity comparison tables, context section anti-patterns, and scope reduction patterns:
+@~/.claude/get-shit-done/references/planner-antipatterns.md
 
 </checkpoints>
 
